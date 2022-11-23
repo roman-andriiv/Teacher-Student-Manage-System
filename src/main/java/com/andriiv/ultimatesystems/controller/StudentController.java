@@ -45,6 +45,13 @@ public class StudentController {
         return new ResponseEntity<>(students, HttpStatus.OK);
     }
 
+    /**
+     * Gets one student.
+     *
+     * @param id the id
+     * @return the one student
+     * @throws ResourceNotFoundException the resource not found exception
+     */
     @GetMapping("/{id}")
     public ResponseEntity<Student> getOneStudent(@PathVariable(value = "id") Long id) throws ResourceNotFoundException {
 
@@ -55,12 +62,17 @@ public class StudentController {
     }
 
 
+    /**
+     * Save student.
+     *
+     * @param student the student
+     * @return the response entity
+     */
     @PostMapping("/save")
     public ResponseEntity<?> saveStudent(@Valid @RequestBody Student student){
 
         studentRepository.save(student);
         return new ResponseEntity<>("Student was saved to DB",HttpStatus.OK);
-
     }
 
 
@@ -91,7 +103,6 @@ public class StudentController {
 
         studentRepository.delete(student);
         return new ResponseEntity<>("Student was deleted from DB", HttpStatus.OK);
-
     }
 
 }
