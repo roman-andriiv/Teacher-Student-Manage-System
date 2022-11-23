@@ -30,13 +30,12 @@ public class Teacher {
     private String firstName;
 
     @NotNull
-    @NotEmpty(message = "The first name should not be empty")
-    @Size(min = 2, message = "The first name should  have at least 2 characters")
+    @NotEmpty(message = "The last name should not be empty")
+    @Size(min = 2, message = "The last name should  have at least 2 characters")
     @Column(name = "last_name")
     private String lastName;
 
     @NotNull
-    @NotEmpty(message = "The age should not be empty")
     @Min(value = 18, message = "The age should be 18 or greater")
     @Column(name = "age")
     private int age;
@@ -50,7 +49,6 @@ public class Teacher {
     @Column(name = "subject")
     private String subject;
 
-    //todo @ManyToMany
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "teachers")
     @JsonIgnore
     private Set<Student> students;

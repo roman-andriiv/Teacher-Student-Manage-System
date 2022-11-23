@@ -28,13 +28,12 @@ public class Student {
     private String firstName;
 
     @NotNull
-    @NotEmpty(message = "The first name should not be empty")
-    @Size(min = 2, message = "The first name should  have at least 2 characters")
+    @NotEmpty(message = "The last name should not be empty")
+    @Size(min = 2, message = "The last name should  have at least 2 characters")
     @Column(name = "last_name")
     private String lastName;
 
     @NotNull
-    @NotEmpty(message = "The age should not be empty")
     @Min(value = 18, message = "The age should be 18 or greater")
     @Column(name = "age")
     private int age;
@@ -48,11 +47,10 @@ public class Student {
     @Column(name = "specialization")
     private String specialization;
 
-    //todo @ManyToMany
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinTable(name = "student_table_teacher",
-            joinColumns ={@JoinColumn(name = "id")},
-            inverseJoinColumns = {@JoinColumn(name = "id")})
+    @JoinTable(name = "students_teachers",
+            joinColumns =@JoinColumn(name = "student_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "teacher_id", referencedColumnName = "id"))
     private Set<Teacher> teachers;
 
 }
