@@ -3,6 +3,7 @@ package com.andriiv.ultimatesystems.controller;
 import com.andriiv.ultimatesystems.entity.Student;
 import com.andriiv.ultimatesystems.entity.Teacher;
 import com.andriiv.ultimatesystems.exception.ResourceNotFoundException;
+import com.andriiv.ultimatesystems.repository.StudentRepository;
 import com.andriiv.ultimatesystems.repository.TeacherRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,10 +21,12 @@ import java.util.List;
 public class TeacherController {
 
     private final TeacherRepository teacherRepository;
+    private final StudentRepository studentRepository;
 
     @Autowired
-    public TeacherController(TeacherRepository teacherRepository) {
+    public TeacherController(TeacherRepository teacherRepository, StudentRepository studentRepository) {
         this.teacherRepository = teacherRepository;
+        this.studentRepository = studentRepository;
     }
 
 
@@ -115,5 +118,62 @@ public class TeacherController {
         teacherRepository.delete(teacher);
         return new ResponseEntity<>("Teacher was deleted successfully", HttpStatus.OK);
 
+    }
+
+    /**
+     * Add a student to the list of students of a specific teacher .
+     *
+     * @param teacherId the teacher id
+     * @param studentId the student id
+     * @return the response entity
+     * @throws ResourceNotFoundException the resource not found exception
+     */
+    @PutMapping("/{teacher_id}/addStudent/{student_id}")
+    public ResponseEntity<?> addStudent(@PathVariable(value = "teacher_id") Long teacherId,
+                                        @PathVariable(value = "student_id") Long studentId) throws ResourceNotFoundException {
+
+        Teacher teacher = teacherRepository.findById(teacherId)
+                .orElseThrow(() -> new ResourceNotFoundException("Teacher not found for this ID :: " + studentId));
+
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Student not found for this ID :: " + studentId));
+
+
+        teacher.getStudents().add(student);
+        teacherRepository.save(teacher);
+
+        student.getTeachers().add(teacher);
+        studentRepository.save(student);
+
+        return new ResponseEntity<>("The student has been added to the list of students", HttpStatus.OK);
+    }
+
+    /**
+     * Remove student from the student list of  the specific teacher.
+     *
+     * @param teacherId the teacher id
+     * @param studentId the student id
+     * @return the response entity
+     * @throws ResourceNotFoundException the resource not found exception
+     */
+    @PutMapping("/{teacher_id}/removeStudent/{student_id}")
+    public ResponseEntity<?> removeStudent(@PathVariable(value = "teacher_id") Long teacherId,
+                                           @PathVariable(value = "student_id") Long studentId) throws ResourceNotFoundException {
+
+        Teacher teacher = teacherRepository.findById(teacherId)
+                .orElseThrow(() -> new ResourceNotFoundException("Teacher not found for this ID :: " + teacherId));
+
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Student not found for this ID :: " + studentId));
+
+        //todo: check whats wrong
+        if (teacher.getStudents().contains(student)){
+
+            teacher.getStudents().remove(student);
+            teacherRepository.save(teacher);
+
+            return new ResponseEntity<>("The student has been removed from the student list", HttpStatus.OK);
+        }else
+            return new ResponseEntity<>("Something wrong", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

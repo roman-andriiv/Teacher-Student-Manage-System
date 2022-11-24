@@ -1,11 +1,12 @@
 package com.andriiv.ultimatesystems.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.*;
-import java.util.Set;
+import java.util.List;
 
 /**
  * @author Roman_Andriiv
@@ -19,7 +20,7 @@ public class Student {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private long id;
+    private Long id;
 
     @NotNull
     @NotEmpty(message = "The first name should not be empty")
@@ -51,6 +52,7 @@ public class Student {
     @JoinTable(name = "students_teachers",
             joinColumns =@JoinColumn(name = "student_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "teacher_id", referencedColumnName = "id"))
-    private Set<Teacher> teachers;
+    @JsonIgnoreProperties("students")
+    private List<Teacher> teachers;
 
 }

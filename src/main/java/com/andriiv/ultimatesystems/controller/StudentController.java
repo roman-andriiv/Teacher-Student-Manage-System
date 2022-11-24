@@ -1,6 +1,7 @@
 package com.andriiv.ultimatesystems.controller;
 
 import com.andriiv.ultimatesystems.entity.Student;
+import com.andriiv.ultimatesystems.entity.Teacher;
 import com.andriiv.ultimatesystems.exception.ResourceNotFoundException;
 import com.andriiv.ultimatesystems.repository.StudentRepository;
 import com.andriiv.ultimatesystems.repository.TeacherRepository;
@@ -22,10 +23,12 @@ import java.util.List;
 public class StudentController {
 
     private final StudentRepository studentRepository;
+    private final TeacherRepository teacherRepository;
 
     @Autowired
-    public StudentController(StudentRepository studentRepository) {
+    public StudentController(StudentRepository studentRepository, TeacherRepository teacherRepository) {
         this.studentRepository = studentRepository;
+        this.teacherRepository = teacherRepository;
     }
 
 
@@ -39,7 +42,7 @@ public class StudentController {
 
         List<Student> students = studentRepository.findAll();
 
-        if (students.isEmpty()){
+        if (students.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(students, HttpStatus.OK);
@@ -56,7 +59,7 @@ public class StudentController {
     public ResponseEntity<Student> getOneStudent(@PathVariable(value = "id") Long id) throws ResourceNotFoundException {
 
         Student student = studentRepository.findById(id)
-                .orElseThrow(()-> new ResourceNotFoundException("Student not found for id :: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Student not found for id :: " + id));
 
         return new ResponseEntity<>(student, HttpStatus.OK);
     }
@@ -69,16 +72,24 @@ public class StudentController {
      * @return the response entity
      */
     @PostMapping("/save")
-    public ResponseEntity<?> saveStudent(@Valid @RequestBody Student student){
+    public ResponseEntity<?> saveStudent(@Valid @RequestBody Student student) {
 
         studentRepository.save(student);
-        return new ResponseEntity<>("Student was saved to DB",HttpStatus.OK);
+        return new ResponseEntity<>("Student was saved to DB", HttpStatus.OK);
     }
 
 
+    /**
+     * Update student response entity.
+     *
+     * @param id             the id
+     * @param studentDetails the student details
+     * @return the response entity
+     * @throws ResourceNotFoundException the resource not found exception
+     */
     @PutMapping("/{id}")
     public ResponseEntity<?> updateStudent(@PathVariable(value = "id") Long id,
-                                                 @Valid @RequestBody Student studentDetails) throws ResourceNotFoundException {
+                                           @Valid @RequestBody Student studentDetails) throws ResourceNotFoundException {
 
         Student student = studentRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Student not found for this ID :: " + id));
@@ -105,4 +116,59 @@ public class StudentController {
         return new ResponseEntity<>("Student was deleted from DB", HttpStatus.OK);
     }
 
+    /**
+     * Add teacher to the list of teachers of a specific student.
+     *
+     * @param studentId the student id
+     * @param teacherId the teacher id
+     * @return the response entity
+     * @throws ResourceNotFoundException the resource not found exception
+     */
+    @PutMapping("/{student_id}/addTeacher/{teacher_id}")
+    public ResponseEntity<?> addTeacher(@PathVariable(value = "student_id") Long studentId,
+                                        @PathVariable(value = "teacher_id") Long teacherId) throws ResourceNotFoundException {
+
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Student not found for this ID :: " + studentId));
+
+        Teacher teacher = teacherRepository.findById(teacherId)
+                .orElseThrow(() -> new ResourceNotFoundException("Teacher not found for this ID :: " + studentId));
+
+        student.getTeachers().add(teacher);
+        studentRepository.save(student);
+
+        teacher.getStudents().add(student);
+        teacherRepository.save(teacher);
+
+        return new ResponseEntity<>("The teachers has been added to teacher list", HttpStatus.OK);
+    }
+
+    /**
+     * Remove teacher from teachers list of specific student.
+     *
+     * @param studentId the student id
+     * @param teacherId the teacher id
+     * @return the response entity
+     * @throws ResourceNotFoundException the resource not found exception
+     */
+    @PutMapping("/{student_id}/removeTeacher/{teacher_id}")
+    public ResponseEntity<?> removeTeacher(@PathVariable(value = "student_id") Long studentId,
+                                           @PathVariable(value = "teacher_id") Long teacherId) throws ResourceNotFoundException {
+
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Student not found for this ID :: " + studentId));
+
+        Teacher teacher = teacherRepository.findById(teacherId)
+                .orElseThrow(() -> new ResourceNotFoundException("Teacher not found for this ID :: " + teacherId));
+
+        if (student.getTeachers().contains(teacher)){
+
+            student.getTeachers().remove(teacher);
+            studentRepository.save(student);
+
+            return new ResponseEntity<>("The teacher has been removed from the teacher list", HttpStatus.OK);
+
+        } else
+            return new ResponseEntity<>("Something wrong", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }

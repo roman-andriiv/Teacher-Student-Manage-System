@@ -1,13 +1,12 @@
 package com.andriiv.ultimatesystems.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.*;
-import java.util.Set;
+import java.util.List;
 
 /**
  * @author Roman_Andriiv
@@ -21,7 +20,7 @@ public class Teacher {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private long id;
+    private Long id;
 
     @NotNull
     @NotEmpty(message = "The first name should not be empty")
@@ -50,6 +49,6 @@ public class Teacher {
     private String subject;
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "teachers")
-    @JsonIgnore
-    private Set<Student> students;
+    @JsonIgnoreProperties("teachers")
+    private List<Student> students;
 }
