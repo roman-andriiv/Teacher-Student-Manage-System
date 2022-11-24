@@ -233,6 +233,13 @@ public class TeacherController {
         }
         return new ResponseEntity<>(teachers, HttpStatus.OK);
     }
+
+    /**
+     * Filter teachers by last name.
+     *
+     * @param lastName the last name
+     * @return the response entity
+     */
     @GetMapping("/filterByLastName/{lastName}")
     public ResponseEntity<?> filterTeachersByLastName(@PathVariable(value = "lastName") String lastName) {
 
@@ -243,4 +250,24 @@ public class TeacherController {
         }
         return new ResponseEntity<>(teachers, HttpStatus.OK);
     }
+
+    /**
+     * Gets teacher students.
+     *
+     * @param id the id
+     * @return the list of teacher students
+     * @throws ResourceNotFoundException the resource not found exception
+     */
+    @GetMapping("/{id}/getStudents")
+    public ResponseEntity<List<Student>> getTeacherStudents(@PathVariable(value = "id") Long id) throws ResourceNotFoundException {
+
+        Teacher teacher = teacherRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Student not found for id :: " + id));
+        List<Student> teacherStudents = teacher.getStudents();
+
+        return new ResponseEntity<>(teacherStudents, HttpStatus.OK);
+    }
 }
+
+
+//todo: transfer all business logic from Controllers to Services

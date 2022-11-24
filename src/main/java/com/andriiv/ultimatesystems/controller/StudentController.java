@@ -139,6 +139,23 @@ public class StudentController {
         return new ResponseEntity<>(student, HttpStatus.OK);
     }
 
+    /**
+     * Gets student teachers.
+     *
+     * @param id the id
+     * @return the student teachers
+     * @throws ResourceNotFoundException the resource not found exception
+     */
+    @GetMapping("/{id}/getTeachers")
+    public ResponseEntity<List<Teacher>> getStudentTeachers(@PathVariable(value = "id") Long id) throws ResourceNotFoundException {
+
+        Student student = studentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Student not found for id :: " + id));
+        List<Teacher> studentTeachers = student.getTeachers();
+
+        return new ResponseEntity<>(studentTeachers, HttpStatus.OK);
+    }
+
 
     /**
      * Save student.
@@ -155,7 +172,7 @@ public class StudentController {
 
 
     /**
-     * Update student response entity.
+     * Update student.
      *
      * @param id             the id
      * @param studentDetails the student details
@@ -181,6 +198,13 @@ public class StudentController {
         return new ResponseEntity<>("Student was updated", HttpStatus.OK);
     }
 
+    /**
+     * Delete student.
+     *
+     * @param id the id
+     * @return the response entity
+     * @throws ResourceNotFoundException the resource not found exception
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteStudent(@PathVariable(value = "id") Long id) throws ResourceNotFoundException {
 
@@ -248,3 +272,6 @@ public class StudentController {
     }
 
 }
+
+
+//todo: transfer all business logic from Controllers to Services
