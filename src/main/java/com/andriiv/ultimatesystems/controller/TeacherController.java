@@ -216,4 +216,31 @@ public class TeacherController {
         }else
             return new ResponseEntity<>("Something wrong", HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    /**
+     * Filter teachers by first name.
+     *
+     * @param firstName the first name
+     * @return the response entity
+     */
+    @GetMapping("/filterByFirstName/{firstName}")
+    public ResponseEntity<?> filterTeachersByFirstName(@PathVariable(value = "firstName") String firstName) {
+
+        List<Teacher> teachers = teacherRepository.findByFirstName(firstName);
+
+        if (teachers.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(teachers, HttpStatus.OK);
+    }
+    @GetMapping("/filterByLastName/{lastName}")
+    public ResponseEntity<?> filterTeachersByLastName(@PathVariable(value = "lastName") String lastName) {
+
+        List<Teacher> teachers = teacherRepository.findByLastName(lastName);
+
+        if (teachers.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(teachers, HttpStatus.OK);
+    }
 }

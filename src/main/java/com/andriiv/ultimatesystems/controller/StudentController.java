@@ -90,6 +90,40 @@ public class StudentController {
     }
 
     /**
+     * Filter students by first name.
+     *
+     * @param firstName the first name
+     * @return the response entity
+     */
+    @GetMapping("/filterByFirstName/{firstName}")
+    public ResponseEntity<?> filterStudentsByFirstName(@PathVariable(value = "firstName") String firstName) {
+
+        List<Student> students = studentRepository.findByFirstName(firstName);
+
+        if (students.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(students, HttpStatus.OK);
+    }
+
+    /**
+     * Filter students by last name.
+     *
+     * @param lastName the last name
+     * @return the response entity
+     */
+    @GetMapping("/filterByLastName/{lastName}")
+    public ResponseEntity<?> filterStudentsByLastName(@PathVariable(value = "lastName") String lastName) {
+
+        List<Student> students = studentRepository.findByLastName(lastName);
+
+        if (students.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(students, HttpStatus.OK);
+    }
+
+    /**
      * Gets one student.
      *
      * @param id the id
@@ -212,4 +246,5 @@ public class StudentController {
         } else
             return new ResponseEntity<>("Something wrong", HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
 }
