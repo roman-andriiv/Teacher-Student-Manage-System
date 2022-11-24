@@ -6,6 +6,10 @@ import com.andriiv.ultimatesystems.exception.ResourceNotFoundException;
 import com.andriiv.ultimatesystems.repository.StudentRepository;
 import com.andriiv.ultimatesystems.repository.TeacherRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -44,6 +48,42 @@ public class TeacherController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(teachers, HttpStatus.OK);
+    }
+
+    /**
+     * Gets all teachers page with specific size.
+     *
+     * @param pageNumber the page number
+     * @param pageSize   the page size
+     * @return the all teachers page with size
+     */
+    @GetMapping("/all/{pageNumber}/{pageSize}")
+    public Page<Teacher> getAllTeachersPageWithSize(@PathVariable(required = false) Integer pageNumber,
+                                                    @PathVariable(required = false) Integer pageSize) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+
+        return teacherRepository.findAll(pageable);
+    }
+
+    /**
+     * Gets all teacher page with size and sorting.
+     *
+     * @param pageNumber   the page number
+     * @param pageSize     the page size
+     * @param sortProperty the sort property
+     * @return the all teacher page with size and sorting
+     */
+    @GetMapping("/all/{pageNumber}/{pageSize}/{sortProperty}")
+    public Page<Teacher> getAllTeacherPageWithSizeAndSorting(@PathVariable Integer pageNumber,
+                                                             @PathVariable Integer pageSize,
+                                                             @PathVariable String sortProperty) {
+        Pageable pageable = null;
+        if (sortProperty!=null) {
+            pageable = PageRequest.of(pageNumber, pageSize, Sort.Direction.ASC, sortProperty);
+        }else {
+            pageable = PageRequest.of(pageNumber, pageSize, Sort.Direction.ASC, "id");
+        }
+        return teacherRepository.findAll(pageable);
     }
 
     /**
